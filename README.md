@@ -76,7 +76,10 @@ This project was built to meet high-level engineering standards, focusing on per
     NEXT_PUBLIC_FIREBASE_API_KEY=your-key
     NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your-project.firebaseapp.com
     NEXT_PUBLIC_FIREBASE_PROJECT_ID=your-project-id
-    # ... other firebase vars
+    NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=
+    NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=
+    NEXT_PUBLIC_FIREBASE_APP_ID=
+    NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID=
     ```
 3.  **Run**:
     ```bash
@@ -85,16 +88,29 @@ This project was built to meet high-level engineering standards, focusing on per
 
 ---
 
-## 📡 API Endpoints
+## 📡 API Endpoints & Postman
+
+### Postman Collection
+A complete Postman collection is included in the repository to help you test the API endpoints.
+- **File**: `backend/CartFlow_API.postman_collection.json`
+- **How to use**:
+    1. Open Postman.
+    2. Click **Import** and select the JSON file.
+    3. Configure the `base_url` variable (defaults to `http://127.0.0.1:8070/api`).
+    4. For protected routes, update the `firebase_token` variable with a valid ID token from the frontend.
 
 ### Authentication
 - `POST /api/auth`: Verifies Firebase Token and syncs user data.
 
 ### Products
 - `GET /api/products`: Retrieves all products.
+- `GET /api/products/{id}`: Retrieves a specific product.
 
 ### Cart (Protected)
 - `GET /api/cart`: Fetches the current user's cart.
+- `POST /api/cart`: Add/update single item.
+- `PATCH /api/cart/{id}`: Update item quantity.
+- `DELETE /api/cart/{id}`: Remove item.
 - `POST /api/cart/batch-update`: Synchronizes the entire frontend cart with the database in one call.
 
 ---
