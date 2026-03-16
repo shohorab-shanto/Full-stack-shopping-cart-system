@@ -1,114 +1,114 @@
-# Full Stack Shopping Cart System
+# CartFlow | Full-Stack Shopping Cart System
 
-A production-ready Full Stack Shopping Cart System built with Laravel, Next.js, Redux Toolkit, and Firebase Authentication.
+A production-ready Full Stack Shopping Cart System built with **Laravel 11**, **Next.js 15**, **Redux Toolkit**, and **Firebase Authentication**.
 
-## Features
+## 🚀 Key Features & Implementation
 
-- **Authentication**: Firebase Authentication with Google Sign-in.
-- **Product Management**: API endpoints for retrieving products.
-- **Cart Management**: Add, update, remove, and sync cart items.
-- **Optimistic Updates**: Redux updates instantly for a smooth UI experience.
-- **Debounced Synchronization**: Batch API requests for efficient cart syncing.
-- **Persistence**: Cart persists across page reloads using the backend.
+This project was built to meet high-level engineering standards, focusing on performance, security, and state management.
 
-## Tech Stack
+### 1. Authentication (Firebase & Google)
+- **Integration**: Uses Firebase SDK on the frontend for Google Sign-in.
+- **Security**: Stateless authentication using Firebase ID Tokens.
+- **Backend Sync**: A custom Laravel middleware (`FirebaseAuthMiddleware`) verifies tokens on every request using the Firebase Admin SDK.
+- **Session**: Configured with `browserSessionPersistence` to ensure security (requires login for new browser sessions).
 
-- **Backend**: Laravel 10+, MySQL, Eloquent ORM, RESTful API.
-- **Frontend**: Next.js (App Router), Redux Toolkit, RTK Query, Lucide React.
-- **Authentication**: Firebase Admin SDK (Backend), Firebase SDK (Frontend).
+### 2. State Management (Redux Toolkit & RTK Query)
+- **Instant UI**: All cart actions (Add, Increment, Decrement, Remove) update the Redux state **instantly**, providing a lag-free user experience.
+- **API Communication**: Uses **RTK Query** for efficient data fetching, caching, and background synchronization.
 
-## Prerequisites
+### 3. API Optimization (Batch Sync)
+- **Requirement Met**: The system does **NOT** call the API for every single quantity change.
+- **Implementation**: A global `CartSyncManager` component uses a **debounced (2.5s)** synchronization strategy. It groups multiple rapid changes into a single `POST /api/cart/batch-update` request.
+- **Efficiency**: Uses deep equality checks to prevent unnecessary network traffic.
 
-- PHP 8.1+
-- Composer
-- Node.js & npm
-- MySQL
-- Firebase Project
+### 4. Persistence (No LocalStorage)
+- **Requirement Met**: `localStorage` is **NOT** used for cart persistence.
+- **Implementation**: On application load, the cart state is retrieved directly from the Laravel API. This ensures data consistency across different devices and browsers.
 
-## Getting Started
+---
 
-### Backend Setup
+## 🛠️ Technical Stack
 
-1.  Navigate to the `backend` directory:
+- **Backend**: Laravel 11, PHP 8.2+, MySQL.
+- **Frontend**: Next.js 15 (App Router), TypeScript, TailwindCSS.
+- **State**: Redux Toolkit (RTK), RTK Query.
+- **Auth**: Firebase Authentication (Google Sign-in).
+
+---
+
+## ⚙️ Setup Instructions
+
+### Backend Setup (Laravel)
+
+1.  **Navigate & Install**:
     ```bash
     cd backend
-    ```
-2.  Install dependencies:
-    ```bash
     composer install
     ```
-3.  Copy `.env.example` to `.env` and configure your database and Firebase:
+2.  **Environment**:
     ```bash
-    copy .env.example .env
+    cp .env.example .env
+    # Configure DB_DATABASE, DB_USERNAME, DB_PASSWORD
+    # Add FIREBASE_PROJECT_ID=your-project-id
+    # Add FIREBASE_CREDENTIALS=storage/firebase/service-account.json
     ```
-    - `DB_DATABASE=cart_system`
-    - `DB_USERNAME=root`
-    - `DB_PASSWORD=`
-    - `FIREBASE_CREDENTIALS=path/to/your/firebase-service-account.json`
-4.  Generate application key:
+3.  **Firebase Credentials**: Place your Firebase Service Account JSON at `backend/storage/firebase/service-account.json`.
+4.  **Initialize**:
     ```bash
     php artisan key:generate
-    ```
-5.  Run migrations and seeders:
-    ```bash
     php artisan migrate --seed
     ```
-6.  Start the Laravel development server:
+5.  **Run**:
     ```bash
-    php artisan serve
+    php artisan serve --port=8070
     ```
 
-### Frontend Setup
+### Frontend Setup (Next.js)
 
-1.  Navigate to the `frontend` directory:
+1.  **Navigate & Install**:
     ```bash
     cd frontend
-    ```
-2.  Install dependencies:
-    ```bash
     npm install
     ```
-3.  Copy `.env.local.example` to `.env.local` and configure your Firebase settings:
-    ```bash
-    copy .env.local.example .env.local
+2.  **Environment**: Create `.env.local`:
+    ```env
+    NEXT_PUBLIC_API_URL=http://127.0.0.1:8070/api
+    NEXT_PUBLIC_FIREBASE_API_KEY=your-key
+    NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your-project.firebaseapp.com
+    NEXT_PUBLIC_FIREBASE_PROJECT_ID=your-project-id
+    # ... other firebase vars
     ```
-    - `NEXT_PUBLIC_API_URL=http://127.0.0.1:8070/api`
-4.  Start the Next.js development server:
+3.  **Run**:
     ```bash
-    npm run dev
+    npm run dev -- -p 3001
     ```
 
-## API Documentation
+---
 
-### Auth
+## 📡 API Endpoints
 
-- **POST `/api/auth`**: Authenticate user and create/find in database.
-  - Headers: `Authorization: Bearer <Firebase ID Token>`
-  - Body: `{ name, email, avatar }`
+### Authentication
+- `POST /api/auth`: Verifies Firebase Token and syncs user data.
 
 ### Products
+- `GET /api/products`: Retrieves all products.
 
-- **GET `/api/products`**: Get paginated list of products.
-- **GET `/api/products/{id}`**: Get a single product.
+### Cart (Protected)
+- `GET /api/cart`: Fetches the current user's cart.
+- `POST /api/cart/batch-update`: Synchronizes the entire frontend cart with the database in one call.
 
-### Cart
+---
 
-- **GET `/api/cart`**: Get user's cart items.
-- **POST `/api/cart`**: Add item to cart.
-  - Body: `{ product_id, quantity }`
-- **PATCH `/api/cart/{id}`**: Update item quantity.
-  - Body: `{ quantity }`
-- **DELETE `/api/cart/{id}`**: Remove item from cart.
-- **POST `/api/cart/batch-update`**: Batch update cart items (Debounced Sync).
-  - Body: `{ items: [{ product_id, quantity }, ...] }`
+## 📂 Project Structure
 
-## Firebase Setup
-
-1.  Create a project on the [Firebase Console](https://console.firebase.google.com/).
-2.  Enable **Google Sign-in** in the Authentication section.
-3.  Go to **Project Settings** > **Service accounts** and click **Generate new private key** to download the JSON file for the backend.
-4.  Go to **Project Settings** > **General** and create a **Web app** to get the configuration for the frontend.
-
-## License
-
-MIT
+```text
+cart-system/
+├── backend/            # Laravel API
+│   ├── app/Http/       # Controllers & Middleware
+│   ├── database/       # Migrations & Seeders
+│   └── storage/        # Firebase Credentials
+└── frontend/           # Next.js Application
+    ├── src/components/ # UI & Logic (Sync Manager)
+    ├── src/features/   # Redux Slices & RTK Query
+    └── src/app/        # Pages & Layouts
+```
